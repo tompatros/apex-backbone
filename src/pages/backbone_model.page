@@ -1,0 +1,70 @@
+<apex:page cache="false" expires="0" showHeader="false" standardStylesheets="false" contentType="text/javascript" controller="BackboneModelController">
+
+<apex:outputPanel rendered="{!types == 'sObject'}">
+var sObject = Backbone.Model.extend({
+	idAttribute : 'Id',
+	sObjectType : 'sObject',	
+	sync : function(method, model, options) {
+	
+		var fields = model.attributes;
+		// remove the 'sObjectType' field in case it's hanging around so SF doesn't freak out
+		delete fields.Id;
+		delete fields.sObjectType;
+		
+		var records = [{
+			sObjectType : model.sObjectType,
+			fields : model.attributes
+		}];
+		
+		var successCallback = options.success;
+		var errorCallback = options.error;
+		
+		if(method == 'create') {
+		
+			Visualforce.remoting.Manager.invokeAction( 'BackboneData.insertRecords', records, function(result, event) {
+     			if(event.status) {
+     				successCallback(event);
+     			}
+     			else {
+     				// TODO
+     				// errorCallback(event);
+     			}
+        	});
+		}
+		
+		else if(method == 'update') {
+		
+			Visualforce.remoting.Manager.invokeAction('BackboneData.updateRecords', records, function(result, event) {
+       			if(event.status) {
+       				successCallback(event);
+       			}
+       			else {
+       				// TODO
+       				// errorCallback(event);
+       			}
+       		})
+       		;
+		}
+		
+	},
+	parse: function(response) {
+		// the response is the "event" parameter return from the remoteAction callback
+		// because this is a model, we want to pass back the first index of response.result
+		// this contains the attributes that will be set() back on the model 
+		console.log(response);
+		return response.result[0] || {};
+	}
+});
+var sObjectCollection = Backbone.Collection.extend( { model : sObject } );
+</apex:outputPanel>
+
+<apex:repeat rendered="{!types != 'sObject'}" value="{!models}" var="m">
+var {!m.name} = sObject.extend({
+	sObjectType : '{!m.name}',
+	salesforceFields : {!m.fieldsJSON},
+	defaults : {!m.defaultsJSON}
+});
+
+var {!m.name}Collection = sObjectCollection.extend({model : {!m.name}});
+</apex:repeat>
+</apex:page>

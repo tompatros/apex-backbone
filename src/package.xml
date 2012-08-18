@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>BackboneData</members>
+        <members>BackboneDataRecord</members>
+        <members>BackboneModel</members>
+        <members>BackboneModelController</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>backbone_model</members>
+        <name>ApexPage</name>
+    </types>
+    <version>24.0</version>
+</Package>
