@@ -1,0 +1,111 @@
+<apex:page showHeader="false" standardStylesheets="false">
+<apex:outputText escape="false" value="{!"<!DOCTYPE html>"}" />
+<html lang="en">
+	<head>
+		<title>apex-backbone DEMO</title>
+		
+		<!-- 
+		This demo page uses the following technologies:
+		jQuery (required for Backbone)
+		Underscore (required for Backbone)
+		Handlebars (for templating
+		Bootstrap (to make the demo page look pretty)
+		-->
+		<apex:stylesheet value="https://s3.amazonaws.com/redargyle/web/bootstrap/2.0.4/css/bootstrap.min.css" />
+	    <apex:stylesheet value="https://s3.amazonaws.com/redargyle/web/bootstrap/2.0.4/css/bootstrap-responsive.min.css" />
+	    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js" />
+	    <apex:includeScript value="https://s3.amazonaws.com/redargyle/web/underscore/1.3.3/underscore-min.js" />
+	    <apex:includeScript value="https://s3.amazonaws.com/redargyle/web/backbone/backbone.0.9.2.js" />
+	    <apex:includeScript value="https://s3.amazonaws.com/redargyle/web/handlebars/handlebars-1.0.0.beta.6.js" />
+	    <apex:includeScript value="https://s3.amazonaws.com/redargyle/web/bootstrap/2.0.4/js/bootstrap.min.js" />
+	    
+	    <!--
+	    Now, we reference the Backbone models we need for our application.
+	    These are handled by backbone_model.page with an optional parameter passed to them.
+	    
+	    First, reference backbone_model with any params to create the generic sObject model and collection.
+	    -->
+	    <apex:includeScript value="{!$Page.backbone_model}" />
+	    
+	    <!--
+	    Next, reference backbone_model with the objects you need
+	    -->
+	    <apex:includeScript value="{!$Page.backbone_model}?types=Account,Contact" />
+	    
+	    <script>
+	    
+	    	var pageAccountCollection, newAccountView;
+	    
+	    	$(document).ready(function() {
+	    	
+	    		pageAccountCollection = new PageAccountCollection();
+	    		pageAccountCollection.on('add', function(account) {
+	    			account.view = new this.newView();
+	    			account.view.model = account;
+	    			account.view.render();
+	    		});
+	    		
+	    		pageAccountCollection.add();
+	    		
+	    	});
+	    
+		    var NewAccountView = Backbone.View.extend({  
+				initialize: function(options) {},
+				render: function() {
+					var $template = Handlebars.compile($('#new-account-template').html());
+					var $html = $template(this.model);
+					$(this.el).html($html);
+					$('#account-container').html($(this.el));
+					return this;
+				},
+				events: {
+					"click a" : "save"
+				},
+				save : function() {
+					this.model.save();
+				}
+			});
+		
+			var PageAccount = Account.extend({
+	    	
+	    	});
+	    	
+	    	var PageAccountCollection = AccountCollection.extend({
+	    		model : PageAccount,
+	    		newView : NewAccountView
+	    	});
+		
+		</script>
+	    
+	</head>
+	<body>
+		<!-- 
+		Reference the BackboneData component to ensure that the @RemoteAction methods in BackboneData class are accessible 
+		to your page so the models will sync and fetch correctly.
+		
+		Alternatively, you can just have your VF page use BackboneData as a controller or extension.
+		-->
+		<c:BackboneData />
+		
+		<div class="container">
+			<div class="page-header">
+				<h1>apex-backbone DEMO</h1>
+			</div>
+			<div class="row">
+				<div class="span12" id="account-container"></div>
+			</div>
+		</div>
+		
+		<script id="new-account-template" type="text/x-handlebars-template">
+			<form class="form-inline well">
+				<label>Account Name: </label>
+				<input data-sf-field="Name" class="span2" type="text" value="{{attributes.Name}}" placeholder="Account Name..." />
+				<label>Account Number: </label>
+				<input data-sf-field="AccountNumber" class="span2" type="text" value="{{attributes.AccountNumber}}" placeholder="Account Number..." />
+				<a class="btn btn-primary">save</a>
+			</form>
+		</script>
+		
+	</body>
+</html>
+</apex:page>

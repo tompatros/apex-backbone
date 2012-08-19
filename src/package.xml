@@ -8,6 +8,11 @@
         <name>ApexClass</name>
     </types>
     <types>
+        <members>BackboneData</members>
+        <name>ApexComponent</name>
+    </types>
+    <types>
+        <members>apex_backbone_demo</members>
         <members>backbone_model</members>
         <name>ApexPage</name>
     </types>

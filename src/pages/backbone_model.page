@@ -1,6 +1,7 @@
 <apex:page cache="false" expires="0" showHeader="false" standardStylesheets="false" contentType="text/javascript" controller="BackboneModelController">
 
-<apex:outputPanel rendered="{!types == 'sObject'}">
+<apex:outputPanel layout="none" rendered="{!types == 'sObject'}">
+// SF sObject Backbone Model
 var sObject = Backbone.Model.extend({
 	idAttribute : 'Id',
 	sObjectType : 'sObject',	
@@ -55,16 +56,25 @@ var sObject = Backbone.Model.extend({
 		return response.result[0] || {};
 	}
 });
+
+// SF sObject Backbone Collection
 var sObjectCollection = Backbone.Collection.extend( { model : sObject } );
 </apex:outputPanel>
 
 <apex:repeat rendered="{!types != 'sObject'}" value="{!models}" var="m">
+
+// SF {!m.name} Backbone Model
 var {!m.name} = sObject.extend({
 	sObjectType : '{!m.name}',
 	salesforceFields : {!m.fieldsJSON},
-	defaults : {!m.defaultsJSON}
+	defaults : {!m.defaultsJSON},
+	validate : function(attributes) {
+		// TODO: required fields to start
+	}
 });
 
+// SF {!m.name} Backbone Collection
 var {!m.name}Collection = sObjectCollection.extend({model : {!m.name}});
+
 </apex:repeat>
 </apex:page>
